@@ -131,9 +131,9 @@ flowchart LR
 
 **Why COMPLIANCE:** HIPAA **164.312(b)** (Audit Controls) requires the ability to record and examine activity in systems that contain or use PHI. For infrastructure-as-code evidence (Terraform plans, policy results, signed bundles), auditors need confidence that records were not altered or deleted before their retention period ends. COMPLIANCE mode provides that guarantee: no principal, including the account root, can shorten retention or delete an object until the lock expires. That is the same immutability expectation enterprise customers and regulators apply to audit logs and compliance artifacts.
 
-**Why not GOVERNANCE:** GOVERNANCE mode allows users with `s3:BypassGovernanceRetention` to override locks. That is acceptable for personal sandbox experimentation but weakens the chain-of-custody story. Because this capstone declares HIPAA as the primary framework and the evidence pipeline is a core deliverable, we chose COMPLIANCE to demonstrate the control as it would be implemented for PHI-adjacent audit evidence in production.
+**Why not GOVERNANCE:** GOVERNANCE mode allows users with `s3:BypassGovernanceRetention` to override locks. That is acceptable for personal sandbox experimentation but weakens the chain-of-custody story. Because this capstone declares HIPAA as the primary framework and the evidence pipeline is a core deliverable, I chose COMPLIANCE to demonstrate the control as it would be implemented for PHI-adjacent audit evidence in production.
 
-**Trade-off accepted:** COMPLIANCE is less forgiving during development. Mis-uploaded or test bundles remain locked for the full retention window (30 days by default). That operational friction is intentional: it mirrors what a GRC engineer accepts when standing up a real evidence vault for a regulated workload.
+**Trade-off accepted:** COMPLIANCE is less forgiving during development. Mis-uploaded or test bundles remain locked for the full retention window (30 days by default). That operational friction is intentional: it mirrors what a GRC engineer accepts when standing up a real evidence vault for a regulated workload. I wanted to be as realistic as possible with the development. 
 
 ---
 

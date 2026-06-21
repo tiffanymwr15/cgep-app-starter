@@ -111,8 +111,10 @@ resource "aws_dynamodb_table" "intake" {
     type = "S"
   }
 
-  # No server_side_encryption block. Defaults to AWS-owned key.
-  # GAP-02: capstone learner expected to add this with a customer-owned key.
+  server_side_encryption {
+    enabled     = true
+    kms_key_arn = aws_kms_key.phi.arn
+  }
 }
 
 ######################################################################
@@ -167,7 +169,7 @@ resource "aws_iam_role_policy_attachment" "lambda_basic" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# GAP-07: deliberately broad permissions on the workload data stores.
+# GAP-07 closed: least-privilege data access + KMS use for encrypted stores.
 resource "aws_iam_role_policy" "lambda_inline" {
   name = "intake-data-access"
   role = aws_iam_role.lambda.id
@@ -176,15 +178,31 @@ resource "aws_iam_role_policy" "lambda_inline" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = "dynamodb:*"
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:Query",
+        ]
         Resource = aws_dynamodb_table.intake.arn
       },
       {
-        Effect   = "Allow"
-        Action   = "s3:*"
-        Resource = ["${aws_s3_bucket.uploads.arn}", "${aws_s3_bucket.uploads.arn}/*"]
-      }
+        Effect = "Allow"
+        Action = [
+          "s3:PutObject",
+          "s3:GetObject",
+        ]
+        Resource = "${aws_s3_bucket.uploads.arn}/*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey",
+        ]
+        Resource = aws_kms_key.phi.arn
+      },
     ]
   })
 }
@@ -205,8 +223,16 @@ resource "aws_lambda_function" "intake" {
     }
   }
 
-  # GAP-05: no vpc_config block. Learner expected to add one referencing
-  # aws_subnet.private[*] and a hardened security group.
+  vpc_config {
+    subnet_ids         = aws_subnet.private[*].id
+    security_group_ids = [aws_security_group.lambda.id]
+  }
+
+  depends_on = [
+    aws_iam_role_policy_attachment.lambda_vpc_access,
+    aws_vpc_endpoint.s3,
+    aws_vpc_endpoint.dynamodb,
+  ]
 }
 
 ######################################################################

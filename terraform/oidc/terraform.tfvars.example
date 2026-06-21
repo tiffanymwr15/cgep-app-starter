@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars and set evidence_vault_name from: cd .. && terraform output -raw evidence_vault_name
+
+aws_region          = "us-east-1"
+github_org          = "tiffanymwr15"
+github_repo         = "cgep-app-starter"
+evidence_vault_name = "acme-health-intake-grc-evidence-vault-XXXXXXXX"

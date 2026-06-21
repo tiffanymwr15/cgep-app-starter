@@ -1,0 +1,17 @@
+# Optional: remote state for GitHub Actions (Phase 3 Step 0b).
+#
+# 1. Create an S3 bucket + DynamoDB table for state locking (one-time, manually or bootstrap).
+# 2. Copy this file to backend.tf and uncomment/fill in.
+# 3. terraform init -migrate-state  (from terraform/ directory)
+#
+# Without remote state, CI runners start with empty state and will fail or recreate resources.
+
+# terraform {
+#   backend "s3" {
+#     bucket         = "your-tfstate-bucket"
+#     key            = "acme-health-capstone/terraform.tfstate"
+#     region         = "us-east-1"
+#     dynamodb_table = "your-tfstate-lock"
+#     encrypt        = true
+#   }
+# }

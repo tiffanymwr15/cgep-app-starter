@@ -62,14 +62,19 @@ Roughly $0 if destroyed within an hour. Lambda + API Gateway + DynamoDB + S3 are
 ```
 cgep-app-starter/
 ├── README.md            # this file
+├── WRITEUP.md           # capstone narrative (architecture, pipeline, OSCAL)
 ├── WORKLOAD.md          # what the API does
 ├── GAPS.md              # the named flaws your policies must catch
 ├── FRAMEWORKS.md        # HIPAA / SOC 2 / CMMC mapping primer
 ├── Makefile             # make deploy | test | destroy
+├── oscal/               # Layer 4 OSCAL artifacts
+├── policies/            # Layer 2 HIPAA Rego suite
+├── scripts/             # policy-gate.sh, verify-evidence.sh
+├── .github/workflows/   # Layer 3 grc-gate.yml
 ├── terraform/
 │   ├── main.tf
-│   ├── variables.tf
-│   ├── outputs.tf
+│   ├── grc_*.tf         # GRC baseline
+│   ├── backend.tf       # remote state
 │   └── lambda/handler.py
 └── test/
     └── intake.sh

@@ -263,6 +263,6 @@ Component: [`oscal/components/acme-health-intake.json`](oscal/components/acme-he
 
 Secondary mapping: NIST SP 800-53 Rev 5 cross-walk (sc-28, sc-8, ac-6, au-2, etc.) is available in NIST SP 800-66 Rev 2 tables but not used as the OSCAL catalog source for this HIPAA-primary submission.
 
-Validate: `trestle validate -t component-definition -n acme-health-intake` (see [`oscal/README.md`](oscal/README.md); output in `evidence/trestle-validate.txt`).
+Validate: `trestle validate -t component-definition -n acme-health-intake` (see [`oscal/README.md`](oscal/README.md); output in `docs/trestle-validate.txt`).
 
 ---

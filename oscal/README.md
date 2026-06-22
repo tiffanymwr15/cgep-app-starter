@@ -36,9 +36,12 @@ trestle validate -t component-definition -n acme-health-intake
 trestle validate -t profile -n hipaa-minimum
 ```
 
-Capture output for submission:
+Capture output for submission (sanitized paths, safe to commit):
 
 ```bash
-trestle validate -t component-definition -n acme-health-intake 2>&1 | tee evidence/trestle-validate.txt
-trestle validate -t profile -n hipaa-minimum 2>&1 | tee -a evidence/trestle-validate.txt
+trestle validate -t catalog -n hipaa-security-rule 2>&1 | sed 's|.*cgep-app-starter/||' | tee docs/trestle-validate.txt
+trestle validate -t component-definition -n acme-health-intake 2>&1 | sed 's|.*cgep-app-starter/||' | tee -a docs/trestle-validate.txt
+trestle validate -t profile -n hipaa-minimum 2>&1 | sed 's|.*cgep-app-starter/||' | tee -a docs/trestle-validate.txt
 ```
+
+The `evidence/` directory is gitignored (may contain local `plan.json` with resource ARNs). Use `docs/trestle-validate.txt` for the grader.

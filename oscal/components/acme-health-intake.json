@@ -1,0 +1,286 @@
+{
+  "component-definition": {
+    "uuid": "7085defd-5c08-4f36-a96a-d87ac24856b9",
+    "metadata": {
+      "title": "Acme Health Patient Intake API (governed)",
+      "last-modified": "2026-06-22T12:00:00.000000+00:00",
+      "version": "1.0.0",
+      "oscal-version": "1.1.3",
+      "roles": [
+        {
+          "id": "provider",
+          "title": "Component provider"
+        }
+      ],
+      "parties": [
+        {
+          "uuid": "f51152f6-1105-4772-9fb6-a72bdafc7257",
+          "type": "organization",
+          "name": "Acme Health (CGE-P capstone)"
+        }
+      ],
+      "remarks": "Primary framework: HIPAA Security Rule. Catalog source follows NIST SP 800-66 Rev 2 guidance (FRAMEWORKS.md): local HIPAA catalog with 164.x control IDs; full citations in hipaa-section props."
+    },
+    "components": [
+      {
+        "uuid": "55cd0bbf-24d7-48a7-aa5b-8e8d9c882e8a",
+        "type": "software",
+        "title": "acme-health-intake",
+        "description": "Governed AWS workload for Acme Health telehealth patient intake: starter API (API Gateway, Lambda, DynamoDB, S3) wrapped with GRC baseline (PHI CMK, evidence vault, CloudTrail), six HIPAA Rego policies, and grc-gate CI pipeline with Cosign evidence upload.",
+        "purpose": "Accept HTTPS patient intake submissions with HIPAA-aligned encryption, network boundary, least-privilege IAM, and auditable infrastructure change evidence.",
+        "responsible-roles": [
+          {
+            "role-id": "provider",
+            "party-uuids": ["f51152f6-1105-4772-9fb6-a72bdafc7257"]
+          }
+        ],
+        "control-implementations": [
+          {
+            "uuid": "95ef364e-b210-4321-ac70-7c35122e5655",
+            "source": "https://raw.githubusercontent.com/tiffanymwr15/cgep-app-starter/main/oscal/catalogs/hipaa-security-rule-catalog.json",
+            "description": "HIPAA Security Rule safeguards for the intake API. Catalog authored for this capstone; implementation guidance per NIST SP 800-66 Rev 2. Each requirement cites the 45 CFR section in hipaa-section props (matching Rego policy metadata).",
+            "implemented-requirements": [
+              {
+                "uuid": "8183a40c-9be8-4dc1-96ce-c56048849c4e",
+                "control-id": "hipaa-164.312-a-2-iv",
+                "description": "GAP-01: Uploads bucket uses SSE-KMS with customer-managed PHI key (aws_s3_bucket_server_side_encryption_configuration.uploads, sse_algorithm = aws:kms). Enforced in CI by compliance.hipaa.s3_kms.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(a)(2)(iv)" },
+                  { "name": "gap-id", "value": "GAP-01" },
+                  { "name": "terraform-resource", "value": "aws_s3_bucket_server_side_encryption_configuration.uploads" },
+                  { "name": "rego-policy", "value": "policies/hipaa_s3_kms.rego" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "Signed main-branch pipeline bundle (plan.json shows aws:kms on uploads)."
+                  },
+                  {
+                    "rel": "reference",
+                    "href": "https://github.com/tiffanymwr15/cgep-app-starter/pull/2",
+                    "text": "Red PR: policy gate failed when GAP-01 was re-introduced (AES256)."
+                  }
+                ]
+              },
+              {
+                "uuid": "99b88f4e-a2ab-44ce-90ca-e4c215bb2395",
+                "control-id": "hipaa-164.312-a-2-iv",
+                "description": "GAP-02: DynamoDB intake table encrypts at rest with the PHI CMK (server_side_encryption.kms_key_arn on aws_dynamodb_table.intake). Enforced by compliance.hipaa.dynamodb_kms.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(a)(2)(iv)" },
+                  { "name": "gap-id", "value": "GAP-02" },
+                  { "name": "terraform-resource", "value": "aws_dynamodb_table.intake" },
+                  { "name": "rego-policy", "value": "policies/hipaa_dynamodb_kms.rego" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "Signed bundle; plan.json contains DynamoDB KMS configuration."
+                  }
+                ]
+              },
+              {
+                "uuid": "f2f53ab0-5b77-4f15-a2b5-5ea318c2a20e",
+                "control-id": "hipaa-164.312-e-1",
+                "description": "GAP-03: Uploads bucket denies non-TLS access via aws:SecureTransport deny in aws_s3_bucket_policy.uploads. Enforced by compliance.hipaa.s3_tls.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(e)(1)" },
+                  { "name": "gap-id", "value": "GAP-03" },
+                  { "name": "terraform-resource", "value": "aws_s3_bucket_policy.uploads" },
+                  { "name": "rego-policy", "value": "policies/hipaa_s3_tls.rego" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "Signed bundle; plan.json contains SecureTransport deny statement."
+                  }
+                ]
+              },
+              {
+                "uuid": "2c4bc8ee-9287-4ec5-afcf-c0036d1fa05e",
+                "control-id": "hipaa-164.308-a-7",
+                "description": "GAP-04: Uploads bucket versioning enabled (aws_s3_bucket_versioning.uploads status = Enabled) for recoverability of PHI overwrites. Enforced by compliance.hipaa.s3_versioning.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.308(a)(7)" },
+                  { "name": "gap-id", "value": "GAP-04" },
+                  { "name": "terraform-resource", "value": "aws_s3_bucket_versioning.uploads" },
+                  { "name": "rego-policy", "value": "policies/hipaa_s3_versioning.rego" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "Signed bundle; plan.json shows versioning Enabled on uploads."
+                  }
+                ]
+              },
+              {
+                "uuid": "fc2faf53-3123-4429-b042-f387e91b5c5a",
+                "control-id": "hipaa-164.312-e-1",
+                "description": "GAP-05: Intake Lambda runs inside starter VPC private subnets with egress-only security group and gateway endpoints for S3/DynamoDB (no NAT). Enforced by compliance.hipaa.lambda_vpc.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(e)(1)" },
+                  { "name": "gap-id", "value": "GAP-05" },
+                  { "name": "terraform-resource", "value": "aws_lambda_function.intake" },
+                  { "name": "terraform-resource", "value": "aws_vpc_endpoint.s3" },
+                  { "name": "terraform-resource", "value": "aws_vpc_endpoint.dynamodb" },
+                  { "name": "rego-policy", "value": "policies/hipaa_lambda_vpc.rego" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "Signed bundle; plan.json contains Lambda vpc_config."
+                  }
+                ]
+              },
+              {
+                "uuid": "eed93107-ff67-4a5f-b38c-1776ae6cacb1",
+                "control-id": "hipaa-164.312-a-1",
+                "description": "GAP-07: Lambda inline IAM policy scoped to required DynamoDB and S3 actions (no dynamodb:* or s3:* wildcards on workload resources). Enforced by compliance.hipaa.least_privilege.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(a)(1)" },
+                  { "name": "gap-id", "value": "GAP-07" },
+                  { "name": "terraform-resource", "value": "aws_iam_role_policy.lambda_inline" },
+                  { "name": "rego-policy", "value": "policies/hipaa_least_privilege.rego" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "Signed bundle; plan.json contains scoped IAM policy document."
+                  }
+                ]
+              },
+              {
+                "uuid": "dfcbca72-8111-4253-ab9b-b7b2a920d7c3",
+                "control-id": "hipaa-164.312-b",
+                "description": "Multi-region CloudTrail with log file validation records management API activity for resources in this account (aws_cloudtrail.mgmt). Supports HIPAA audit controls for infrastructure changes.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(b)" },
+                  { "name": "terraform-resource", "value": "aws_cloudtrail.mgmt" },
+                  { "name": "terraform-resource", "value": "aws_s3_bucket.cloudtrail" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "Signed bundle; plan.json includes CloudTrail trail resource."
+                  }
+                ]
+              },
+              {
+                "uuid": "a70197e0-5ab7-4f4e-a254-a4aded67a7f0",
+                "control-id": "hipaa-164.312-b",
+                "description": "CloudTrail log content includes standard event fields; trail delivers to dedicated SSE-KMS S3 bucket with public access blocked.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(b)" },
+                  { "name": "terraform-resource", "value": "aws_cloudtrail.mgmt" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "Signed bundle; CloudTrail and log bucket in plan."
+                  }
+                ]
+              },
+              {
+                "uuid": "bf11c6cf-b653-43fe-bc61-d724ee90fefb",
+                "control-id": "hipaa-164.312-b",
+                "description": "Evidence vault stores signed Terraform/policy bundles under COMPLIANCE Object Lock (30-day retention) with SSE-KMS. Pipeline uploads to runs/<RUN_ID>/ prefix after main-branch merge.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(b)" },
+                  { "name": "terraform-resource", "value": "aws_s3_bucket.evidence_vault" },
+                  { "name": "terraform-resource", "value": "aws_s3_bucket_object_lock_configuration.evidence_vault" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz",
+                    "text": "This bundle is stored in the vault with Cosign signature and SHA-256 sidecar."
+                  },
+                  {
+                    "rel": "reference",
+                    "href": "https://github.com/tiffanymwr15/cgep-app-starter/actions/runs/27923873028",
+                    "text": "GitHub Actions run that produced and uploaded the bundle."
+                  }
+                ]
+              },
+              {
+                "uuid": "23ca9d5e-415c-4205-aa89-2985a4c48e6d",
+                "control-id": "hipaa-164.312-b",
+                "description": "grc-gate workflow signs evidence bundles with Cosign keyless (Sigstore) before vault upload. scripts/verify-evidence.sh checks SHA-256 integrity and Cosign/Rekor authenticity.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(b)" },
+                  { "name": "workflow", "value": ".github/workflows/grc-gate.yml" }
+                ],
+                "links": [
+                  {
+                    "rel": "evidence",
+                    "href": "s3://acme-health-intake-grc-evidence-vault-f88cc5df/runs/27923873028/evidence-27923873028-bf5834ae793038b3f1379ac9dec8bef02ea878ae.tar.gz.sig.bundle",
+                    "text": "Cosign bundle for main pipeline run 27923873028."
+                  },
+                  {
+                    "rel": "reference",
+                    "href": "https://github.com/tiffanymwr15/cgep-app-starter/blob/main/scripts/verify-evidence.sh",
+                    "text": "Chain-of-custody verification script."
+                  }
+                ]
+              },
+              {
+                "uuid": "362d14b3-c239-44e2-923f-cf230903fa7f",
+                "control-id": "hipaa-164.312-b",
+                "description": "GAP-06: Lambda has no DLQ, X-Ray tracing, or reserved concurrency. Deferred for sandbox scope; documented in WRITEUP.md trade-offs.",
+                "props": [
+                  { "name": "implementation-status", "value": "planned" },
+                  { "name": "hipaa-control", "value": "164.312(b)" },
+                  { "name": "gap-id", "value": "GAP-06" },
+                  { "name": "soc2-control", "value": "CC7.2" }
+                ],
+                "links": [
+                  {
+                    "rel": "reference",
+                    "href": "https://github.com/tiffanymwr15/cgep-app-starter/blob/main/WRITEUP.md#gap-06-and-gap-08-not-implemented",
+                    "text": "Honest gap documentation."
+                  }
+                ]
+              },
+              {
+                "uuid": "dda44360-ab19-4efa-a37a-1632b2e24e7c",
+                "control-id": "hipaa-164.312-b",
+                "description": "GAP-08: API Gateway stage has no access logging, throttling limits, or WAF association. CloudTrail does not log data-plane HTTP requests. Planned for next sprint.",
+                "props": [
+                  { "name": "implementation-status", "value": "planned" },
+                  { "name": "hipaa-control", "value": "164.312(b)" },
+                  { "name": "gap-id", "value": "GAP-08" },
+                  { "name": "terraform-resource", "value": "aws_apigatewayv2_stage.default" }
+                ],
+                "links": [
+                  {
+                    "rel": "reference",
+                    "href": "https://github.com/tiffanymwr15/cgep-app-starter/blob/main/WRITEUP.md#next-sprint",
+                    "text": "Next sprint: API access logs and WAF."
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

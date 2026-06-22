@@ -4,7 +4,7 @@
 
 Acme Health is a telehealth company handling PHI through the Patient Intake API. This repository wraps the intentionally non-compliant starter workload with a GRC baseline (Terraform), OPA policy suite, GitHub Actions evidence pipeline, and OSCAL component. HIPAA is the declared primary framework because the workload processes patient intake data; every policy cites HIPAA Technical Safeguard sections, and OSCAL maps implementations to those controls.
 
-**Deployment:** `us-east-1`, personal sandbox account, fork at [tiffanymwr15/cgep-app-starter](https://github.com/tiffanymwr15/cgep-app-starter). Layers 1–3 are deployed and demonstrated in CI. Layer 4 (OSCAL) is the remaining deliverable.
+**Deployment:** `us-east-1`, personal sandbox account, fork at [tiffanymwr15/cgep-app-starter](https://github.com/tiffanymwr15/cgep-app-starter). All four capstone layers are implemented.
 
 ---
 
@@ -12,11 +12,11 @@ Acme Health is a telehealth company handling PHI through the Patient Intake API.
 
 ### Four layers (capstone model)
 
-The repo integrates four layers around a single AWS workload in `us-east-1`. Layers 1–3 are deployed; Layer 4 (OSCAL) documents the traceability chain for graders and auditors.
+The repo integrates four layers around a single AWS workload in `us-east-1`. All four layers are deployed and documented.
 
 ```mermaid
 flowchart TB
-  subgraph layer4 [Layer 4 OSCAL in progress]
+  subgraph layer4 [Layer 4 OSCAL deployed]
     OSCAL[component-definition.json]
     Profile[hipaa-minimum profile]
   end
@@ -200,7 +200,7 @@ All six Rego policies live under `policies/` with pass/fail fixtures in `policie
 
 ### Three-layer defense for six gaps
 
-For GAP-01 through GAP-05 and GAP-07, I used all three capstone layers where applicable: Terraform override, Rego policy that fails the plan if the gap returns, and (in progress) OSCAL `implemented-requirement` entries linking Terraform resources, policies, and pipeline evidence. PR #2 demonstrates the policy layer: changing uploads SSE from `aws:kms` to `AES256` failed CI with a HIPAA citation before any apply could run.
+For GAP-01 through GAP-05 and GAP-07, I used all three capstone layers: Terraform override, Rego policy that fails the plan if the gap returns, and OSCAL `implemented-requirement` entries in [`oscal/components/acme-health-intake.json`](oscal/components/acme-health-intake.json) linking Terraform resources, policies, and pipeline evidence. PR #2 demonstrates the policy layer: changing uploads SSE from `aws:kms` to `AES256` failed CI with a HIPAA citation before any apply could run.
 
 ### GAP-06 and GAP-08 (not implemented)
 
@@ -241,7 +241,28 @@ Ordered by HIPAA materiality for Acme Health:
 2. **GAP-08 — WAF + throttling** — Associate AWS WAF with the HTTP API; set stage throttle limits; document residual risk if WAF is org-level rather than in this repo.
 3. **GAP-06 — Lambda resilience** — Add SQS DLQ, X-Ray tracing, and optionally reserved concurrency; extend policy suite or accept OSCAL-only documentation with a monitoring runbook.
 4. **Tighten OIDC IAM** — Replace `AdministratorAccess` on `cgep-grc-gate` with a scoped policy; keep vault-write inline policy.
-5. **OSCAL + trestle** — Publish `oscal/components/acme-health-intake.json`, optional `hipaa-minimum` profile, run `trestle validate`, link evidence bundle from run 27923873028 on each `implemented-requirement`.
-6. **KMS key policy for evidence reviewers** — Grant break-glass read (`kms:Decrypt`) to a dedicated auditor role so `verify-evidence.sh` works without the CI admin role.
+5. **KMS key policy for evidence reviewers** — Grant break-glass read (`kms:Decrypt`) to a dedicated auditor role so `verify-evidence.sh` works without the CI admin role.
+
+---
+
+## OSCAL (Layer 4)
+
+Component: [`oscal/components/acme-health-intake.json`](oscal/components/acme-health-intake.json). Catalog: [`oscal/catalogs/hipaa-security-rule-catalog.json`](oscal/catalogs/hipaa-security-rule-catalog.json) (SP 800-66 Rev 2 aligned). Profile: [`oscal/profiles/hipaa-minimum.json`](oscal/profiles/hipaa-minimum.json).
+
+| HIPAA `control-id` | CFR citation (props) | Gap / scope | Status |
+|---|---|---|---|
+| hipaa-164.312-a-2-iv | 164.312(a)(2)(iv) | GAP-01 uploads KMS | implemented |
+| hipaa-164.312-a-2-iv | 164.312(a)(2)(iv) | GAP-02 DynamoDB KMS | implemented |
+| hipaa-164.312-e-1 | 164.312(e)(1) | GAP-03 TLS deny | implemented |
+| hipaa-164.308-a-7 | 164.308(a)(7) | GAP-04 versioning | implemented |
+| hipaa-164.312-e-1 | 164.312(e)(1) | GAP-05 Lambda VPC | implemented |
+| hipaa-164.312-a-1 | 164.312(a)(1) | GAP-07 least privilege | implemented |
+| hipaa-164.312-b | 164.312(b) | CloudTrail, vault, Cosign pipeline | implemented |
+| hipaa-164.312-b | 164.312(b) | GAP-06 DLQ/X-Ray | planned |
+| hipaa-164.312-b | 164.312(b) | GAP-08 API logs/WAF | planned |
+
+Secondary mapping: NIST SP 800-53 Rev 5 cross-walk (sc-28, sc-8, ac-6, au-2, etc.) is available in NIST SP 800-66 Rev 2 tables but not used as the OSCAL catalog source for this HIPAA-primary submission.
+
+Validate: `trestle validate -t component-definition -n acme-health-intake` (see [`oscal/README.md`](oscal/README.md); output in `evidence/trestle-validate.txt`).
 
 ---

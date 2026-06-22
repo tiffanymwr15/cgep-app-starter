@@ -1,0 +1,78 @@
+{
+  "catalog": {
+    "uuid": "a3b1c2d4-e5f6-4789-a012-3456789abcde",
+    "metadata": {
+      "title": "HIPAA Security Rule — Acme Health capstone selection",
+      "last-modified": "2026-06-22T14:00:00.000000+00:00",
+      "version": "1.0.0",
+      "oscal-version": "1.1.3",
+      "remarks": "NIST does not publish a machine-readable OSCAL catalog for the HIPAA Security Rule. This catalog lists the 45 CFR 164.x safeguards implemented by the acme-health-intake component. Implementation guidance follows NIST SP 800-66 Rev 2 (Implementing the HIPAA Security Rule).",
+      "links": [
+        {
+          "rel": "reference",
+          "href": "https://csrc.nist.gov/publications/detail/sp/800-66/rev-2/final",
+          "text": "NIST SP 800-66 Rev 2 — Implementing the HIPAA Security Rule"
+        },
+        {
+          "rel": "reference",
+          "href": "https://www.ecfr.gov/current/title-45/subtitle-A/subchapter-C/part-164/subpart-C",
+          "text": "HIPAA Security Rule (45 CFR Part 164 Subpart C)"
+        }
+      ]
+    },
+    "groups": [
+      {
+        "id": "hipaa-164.308",
+        "title": "Administrative Safeguards (164.308)",
+        "controls": [
+          {
+            "id": "hipaa-164.308-a-7",
+            "class": "HIPAA",
+            "title": "Contingency Plan (164.308(a)(7))",
+            "props": [
+              { "name": "hipaa-section", "value": "164.308(a)(7)" }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "hipaa-164.312",
+        "title": "Technical Safeguards (164.312)",
+        "controls": [
+          {
+            "id": "hipaa-164.312-a-1",
+            "class": "HIPAA",
+            "title": "Access Control (164.312(a)(1))",
+            "props": [
+              { "name": "hipaa-section", "value": "164.312(a)(1)" }
+            ]
+          },
+          {
+            "id": "hipaa-164.312-a-2-iv",
+            "class": "HIPAA",
+            "title": "Encryption and Decryption (164.312(a)(2)(iv))",
+            "props": [
+              { "name": "hipaa-section", "value": "164.312(a)(2)(iv)" }
+            ]
+          },
+          {
+            "id": "hipaa-164.312-b",
+            "class": "HIPAA",
+            "title": "Audit Controls (164.312(b))",
+            "props": [
+              { "name": "hipaa-section", "value": "164.312(b)" }
+            ]
+          },
+          {
+            "id": "hipaa-164.312-e-1",
+            "class": "HIPAA",
+            "title": "Transmission Security (164.312(e)(1))",
+            "props": [
+              { "name": "hipaa-section", "value": "164.312(e)(1)" }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

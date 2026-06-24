@@ -242,6 +242,25 @@
                 ]
               },
               {
+                "uuid": "a8f4e2c1-9b3d-4e7a-8c1f-2d5e6f7a8b9c",
+                "control-id": "hipaa-164.312-b",
+                "description": "HIPAA drift detection: CloudTrail management events match four EventBridge rules (DET-01..04). Detector Lambda classifies PHI-relevant misconfiguration, deduplicates by eventID (DynamoDB TTL), and routes JSON alerts to SNS. Unit tests replay fixtures in monitoring/tests/.",
+                "props": [
+                  { "name": "implementation-status", "value": "implemented" },
+                  { "name": "hipaa-control", "value": "164.312(b)" },
+                  { "name": "detection-id", "value": "DET-01,DET-02,DET-03,DET-04" },
+                  { "name": "terraform-resource", "value": "terraform/grc_detection.tf" },
+                  { "name": "monitoring-code", "value": "monitoring/detector/classify.py" }
+                ],
+                "links": [
+                  {
+                    "rel": "reference",
+                    "href": "https://github.com/tiffanymwr15/cgep-app-starter/blob/main/docs/MONITORING.md",
+                    "text": "Detection catalog, alert routing, and test instructions."
+                  }
+                ]
+              },
+              {
                 "uuid": "362d14b3-c239-44e2-923f-cf230903fa7f",
                 "control-id": "hipaa-164.312-b",
                 "description": "GAP-06: Lambda has no DLQ, X-Ray tracing, or reserved concurrency. Deferred for sandbox scope; documented in WRITEUP.md trade-offs.",

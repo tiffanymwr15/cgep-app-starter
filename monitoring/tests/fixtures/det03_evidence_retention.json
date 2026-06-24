@@ -1,0 +1,16 @@
+{
+  "eventID": "ddd44444-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "eventName": "PutObjectRetention",
+  "eventSource": "s3.amazonaws.com",
+  "userIdentity": {
+    "type": "IAMUser",
+    "userName": "evidence-admin"
+  },
+  "requestParameters": {
+    "bucketName": "acme-health-intake-grc-evidence-vault-deadbeef",
+    "retention": {
+      "mode": "GOVERNANCE",
+      "retainUntilDate": "2026-12-31T00:00:00.000Z"
+    }
+  }
+}

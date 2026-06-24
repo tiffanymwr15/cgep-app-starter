@@ -107,6 +107,11 @@ resource "aws_kms_key" "phi" {
     Name    = "${local.name_prefix}-phi-cmk"
     Purpose = "phi-encryption"
   }
+
+  lifecycle {
+    # capstone-deploy-user often lacks kms:PutKeyPolicy after initial create.
+    ignore_changes = [policy]
+  }
 }
 
 resource "aws_kms_alias" "phi" {

@@ -127,6 +127,29 @@ flowchart LR
 
 ---
 
+## Continuous monitoring (Layer 1b)
+
+Passive CloudTrail logging records management API activity. **Active detection** closes the rubric gap: targeted rules, deduplication, alert routing, and fixture-based tests.
+
+See [`docs/MONITORING.md`](docs/MONITORING.md) for the full runbook. Terraform: [`terraform/grc_detection.tf`](terraform/grc_detection.tf). Code: [`monitoring/detector/`](monitoring/detector/).
+
+| Detection | EventBridge trigger | Control / gap | Alert routing |
+|---|---|---|---|
+| DET-01 | S3 PAB weaken/remove, public bucket policy on PHI buckets | 164.312(a)(1), GAP-01/03 | SNS `security-alerts` |
+| DET-02 | PHI CMK disable or schedule deletion | 164.312(a)(2)(iv), GAP-01/02 | SNS (CRITICAL) |
+| DET-03 | Evidence vault retention / legal-hold change | 164.312(b) | SNS |
+| DET-04 | Lambda role regains `dynamodb:*` / `s3:*` | 164.312(a)(1), GAP-07 | SNS |
+
+**Noise reduction:** DynamoDB dedup table with 1-hour TTL on CloudTrail `eventID`.
+
+**Tests:** `make test-monitoring` or `pytest monitoring/tests -v` (also runs in `grc-gate.yml`).
+
+**Email (optional):** set `security_alert_email` in local `terraform.tfvars`; confirm the SNS subscription after apply.
+
+**Residual gap:** GAP-08 (API access logs / WAF) is still data-plane monitoring and remains in the next sprint below.
+
+---
+
 ## Evidence pipeline (Layer 3)
 
 Workflow: [`.github/workflows/grc-gate.yml`](.github/workflows/grc-gate.yml). GitHub Actions assumes the `cgep-grc-gate` IAM role via OIDC (no long-lived AWS keys). Terraform state lives in S3 (`terraform/backend.tf`) so PR and main jobs plan against the same infrastructure.
@@ -258,6 +281,7 @@ Component: [`oscal/components/acme-health-intake.json`](oscal/components/acme-he
 | hipaa-164.312-e-1 | 164.312(e)(1) | GAP-05 Lambda VPC | implemented |
 | hipaa-164.312-a-1 | 164.312(a)(1) | GAP-07 least privilege | implemented |
 | hipaa-164.312-b | 164.312(b) | CloudTrail, vault, Cosign pipeline | implemented |
+| hipaa-164.312-b | 164.312(b) | DET-01..04 drift detection (EventBridge + Lambda) | implemented |
 | hipaa-164.312-b | 164.312(b) | GAP-06 DLQ/X-Ray | planned |
 | hipaa-164.312-b | 164.312(b) | GAP-08 API logs/WAF | planned |
 

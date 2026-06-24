@@ -11,10 +11,13 @@ crash.log
 
 # Lambda build
 terraform/lambda/handler.zip
+terraform/detector.zip
 
 # Local
 evidence/
 .trestle/
+__pycache__/
+.pytest_cache/
 .terraform/
 terraform/plan.json
 terraform/tfplan

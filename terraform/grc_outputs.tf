@@ -32,3 +32,18 @@ output "cloudtrail_bucket" {
   value       = aws_s3_bucket.cloudtrail.id
   description = "S3 bucket receiving CloudTrail log files."
 }
+
+output "security_alerts_topic_arn" {
+  value       = aws_sns_topic.security_alerts.arn
+  description = "SNS topic for HIPAA drift detection alerts (DET-01 through DET-04)."
+}
+
+output "detector_lambda_name" {
+  value       = aws_lambda_function.detector.function_name
+  description = "CloudTrail drift detector Lambda (classify, dedup, route)."
+}
+
+output "detection_rule_names" {
+  value       = [for rule in aws_cloudwatch_event_rule.detection : rule.name]
+  description = "EventBridge rules feeding the detector Lambda."
+}

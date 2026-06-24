@@ -17,10 +17,13 @@ git clone https://github.com/GRCEngClub/cgep-app-starter
 cd cgep-app-starter
 
 # Confirm you're authenticated to the right account:
-make creds AWS_PROFILE=<your-sandbox-profile>
+bash scripts/deploy.sh <your-sandbox-profile>   # or: make creds AWS_PROFILE=<profile>
 
-make deploy AWS_PROFILE=<your-sandbox-profile>
-make test    AWS_PROFILE=<your-sandbox-profile>
+# Deploy (pick one):
+bash scripts/deploy.sh <your-sandbox-profile>     # no GNU make required (Windows)
+make deploy AWS_PROFILE=<your-sandbox-profile>    # if make is installed
+
+bash scripts/test-api.sh <your-sandbox-profile>  # or: make test AWS_PROFILE=<profile>
 ```
 
 > **AWS SSO note:** if your profile is SSO-based, Terraform's AWS provider can fail to read it directly with `failed to find SSO session section`. The Makefile's `eval $(aws configure export-credentials)` pattern handles this. If you're running `terraform` commands by hand, do the same export first.
@@ -66,7 +69,9 @@ cgep-app-starter/
 ├── WORKLOAD.md          # what the API does
 ├── GAPS.md              # the named flaws your policies must catch
 ├── FRAMEWORKS.md        # HIPAA / SOC 2 / CMMC mapping primer
-├── Makefile             # make deploy | test | destroy
+├── Makefile             # make deploy | test | test-monitoring | destroy
+├── docs/                # MONITORING.md, setup notes
+├── monitoring/          # Layer 1b drift detector + fixture tests
 ├── oscal/               # Layer 4 OSCAL artifacts
 ├── policies/            # Layer 2 HIPAA Rego suite
 ├── scripts/             # policy-gate.sh, verify-evidence.sh

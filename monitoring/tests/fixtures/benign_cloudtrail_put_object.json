@@ -1,0 +1,13 @@
+{
+  "eventID": "fff66666-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "eventName": "PutObject",
+  "eventSource": "s3.amazonaws.com",
+  "userIdentity": {
+    "type": "AssumedRole",
+    "arn": "arn:aws:sts::123456789012:assumed-role/acme-health-intake-lambda-deadbeef/session"
+  },
+  "requestParameters": {
+    "bucketName": "acme-health-intake-uploads-deadbeef",
+    "key": "patient/P-0001/intake.json"
+  }
+}

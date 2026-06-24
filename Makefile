@@ -1,4 +1,4 @@
-.PHONY: deploy plan test destroy fmt creds
+.PHONY: deploy plan test destroy fmt creds test-monitoring
 
 # Set AWS_PROFILE in your shell before running, or pass on the command line:
 #   make deploy AWS_PROFILE=my-sandbox
@@ -21,6 +21,9 @@ test: ## Smoke test the deployed API
 			-H 'content-type: application/json' \
 			-d '{"patient_id":"P-0001","fields":{"reason":"smoke-test"}}' \
 		| python3 -m json.tool
+
+test-monitoring: ## Run HIPAA detection unit tests (fixture replay)
+	python -m pytest monitoring/tests -v
 
 destroy: ## Tear it all down
 	@$(CREDS) && cd terraform && terraform destroy -auto-approve

@@ -1,0 +1,18 @@
+{
+  "eventID": "aaa11111-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "eventName": "PutBucketPublicAccessBlock",
+  "eventSource": "s3.amazonaws.com",
+  "userIdentity": {
+    "type": "IAMUser",
+    "userName": "break-glass-admin"
+  },
+  "requestParameters": {
+    "bucketName": "acme-health-intake-uploads-deadbeef",
+    "publicAccessBlockConfiguration": {
+      "blockPublicAcls": false,
+      "blockPublicPolicy": true,
+      "ignorePublicAcls": true,
+      "restrictPublicBuckets": true
+    }
+  }
+}

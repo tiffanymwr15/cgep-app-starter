@@ -1,0 +1,18 @@
+{
+  "eventID": "bbb22222-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "eventName": "PutBucketPublicAccessBlock",
+  "eventSource": "s3.amazonaws.com",
+  "userIdentity": {
+    "type": "AssumedRole",
+    "arn": "arn:aws:sts::123456789012:assumed-role/cgep-grc-gate/session"
+  },
+  "requestParameters": {
+    "bucketName": "acme-health-intake-uploads-deadbeef",
+    "publicAccessBlockConfiguration": {
+      "blockPublicAcls": true,
+      "blockPublicPolicy": true,
+      "ignorePublicAcls": true,
+      "restrictPublicBuckets": true
+    }
+  }
+}

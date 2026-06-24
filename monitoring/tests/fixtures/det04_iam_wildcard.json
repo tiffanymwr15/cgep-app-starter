@@ -1,0 +1,23 @@
+{
+  "eventID": "eee55555-bbbb-cccc-dddd-eeeeeeeeeeee",
+  "eventName": "PutRolePolicy",
+  "eventSource": "iam.amazonaws.com",
+  "userIdentity": {
+    "type": "IAMUser",
+    "userName": "iam-admin"
+  },
+  "requestParameters": {
+    "roleName": "acme-health-intake-lambda-deadbeef",
+    "policyName": "intake-data-access",
+    "policyDocument": {
+      "Version": "2012-10-17",
+      "Statement": [
+        {
+          "Effect": "Allow",
+          "Action": ["dynamodb:*", "s3:*"],
+          "Resource": "*"
+        }
+      ]
+    }
+  }
+}

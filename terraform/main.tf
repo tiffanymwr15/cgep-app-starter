@@ -28,6 +28,13 @@ provider "aws" {
   }
 }
 
+# Sandbox deploy users often lack sns:TagResource / events:TagResource. Use this
+# provider alias for monitoring resources so Create* succeeds without tagging.
+provider "aws" {
+  alias  = "no_default_tags"
+  region = var.aws_region
+}
+
 resource "random_id" "suffix" {
   byte_length = 4
 }
